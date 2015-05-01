@@ -264,7 +264,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
 	rild.libpath=/system/lib/libril-qc-qmi-1.so
 
 PRODUCT_PROPERTY_OVERRIDES += \
-	telephony.lteOnCdmaDevice=0
+	telephony.lteOnCdmaDevice=1
 
 ifeq ($(findstring tiny, $(TARGET_PRODUCT)),)
 PRODUCT_PROPERTY_OVERRIDES += \
