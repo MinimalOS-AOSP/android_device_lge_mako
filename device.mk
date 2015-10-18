@@ -142,7 +142,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	
 # http://b/15193147
 # TODO(danalbert): Remove this once stlport is dead and gone.
-+PRODUCT_PACKAGES +=  libstlport
+PRODUCT_PACKAGES +=  libstlport
 
 # Audio Configuration
 # FIXME: Remove persist.audio.handset.mic and persist.audio.fluence.mode
@@ -168,8 +168,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += persist.hwc.mdpcomp.enable=true
 
 PRODUCT_CHARACTERISTICS := nosdcard
-
-PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_PACKAGES += \
 	librs_jni \
