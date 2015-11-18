@@ -134,38 +134,50 @@ set_notification_led_locked(struct light_device_t* dev,
     int blink, freq, pwm;
     int onMS, offMS;
 
-    switch (state->flashMode) {
-        case LIGHT_FLASH_TIMED:
-            onMS = state->flashOnMS;
-            offMS = state->flashOffMS;
-            break;
-        case LIGHT_FLASH_NONE:
-        default:
-            onMS = 0;
-            offMS = 0;
-            break;
-    }
-
-    red = (state->color >> 16) & 0xFF;
-    green = (state->color >> 8) & 0xFF;
-    blue = state->color & 0xFF;
-
-    if (onMS > 0 && offMS > 0 && is_lit(state)) {
-        int totalMS = onMS + offMS;
-
-        // the freq value must be set as period/50
-        freq = totalMS / 50;
-
-        // pwm specifies the ratio of ON versus OFF
-        // pwm = 0 -> always off
-        // pwm = 255 => always on
-        pwm = (onMS * 255) / totalMS;
-
-        blink = 1;
+    if (state == NULL) {
+        red = green = blue = 0;
+        onMS = offMS = 0;
+        blink = freq = pwm = 0;
     } else {
-        blink = 0;
-        freq = 0;
-        pwm = 0;
+        switch (state->flashMode) {
+            case LIGHT_FLASH_TIMED:
+                onMS = state->flashOnMS;
+                offMS = state->flashOffMS;
+                break;
+            case LIGHT_FLASH_NONE:
+            default:
+                onMS = 0;
+                offMS = 0;
+                break;
+        }
+
+        red = (state->color >> 16) & 0xFF;
+        green = (state->color >> 8) & 0xFF;
+        blue = state->color & 0xFF;
+
+        if (onMS > 0 && offMS > 0) {
+            int totalMS = onMS + offMS;
+
+            // the LED appears to blink about once per second if freq is 20
+            // 1000ms / 20 = 50
+            freq = totalMS / 50;
+
+            // pwm specifies the ratio of ON versus OFF
+            // pwm = 0 -> always off
+            // pwm = 255 => always on
+            pwm = (onMS * 255) / totalMS;
+
+            // the low 4 bits are ignored, so round up if necessary
+            if (pwm > 0 && pwm < 16) {
+                pwm = 16;
+            }
+
+            blink = 1;
+        } else {
+            blink = 0;
+            freq = 0;
+            pwm = 0;
+        }
     }
 
     ALOGV("%s: red %d green %d blue %d onMS %d offMS %d",
@@ -191,11 +203,12 @@ set_notification_led_locked(struct light_device_t* dev,
 static void
 update_notification_led_locked(struct light_device_t* dev)
 {
+    set_notification_led_locked(dev, NULL);
     if (is_lit(&g_attention)) {
         set_notification_led_locked(dev, &g_attention);
     } else if (is_lit(&g_notification)) {
         set_notification_led_locked(dev, &g_notification);
-    } else {
+    } else if (is_lit(&g_battery)) {
         set_notification_led_locked(dev, &g_battery);
     }
 }
