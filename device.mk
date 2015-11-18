@@ -36,7 +36,7 @@ PRODUCT_PACKAGES := \
     wpa_supplicant.conf
 
 PRODUCT_PACKAGES += \
-	lights.mako
+	lights.msm8960
 
 PRODUCT_PACKAGES += \
     charger_res_images
